@@ -1,0 +1,81 @@
+@import 'tailwindcss';
+
+:root {
+  --bg-base: #0a0c12;
+  --bg-surface: #11141d;
+  --bg-surface-2: #171b27;
+  --bg-surface-3: #1e2333;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  --text-primary: #f3f5fb;
+  --text-secondary: #a7aec2;
+  --text-muted: #707893;
+
+  --accent-blue: #4c8dff;
+  --accent-blue-soft: rgba(76, 141, 255, 0.14);
+  --accent-purple: #9d7bff;
+  --accent-purple-soft: rgba(157, 123, 255, 0.14);
+  --accent-mint: #36d6a3;
+  --accent-mint-soft: rgba(54, 214, 163, 0.14);
+  --accent-amber: #f5b85c;
+  --accent-rose: #f06a8c;
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-base);
+  color: var(--text-primary);
+}
+
+body {
+  font-family: 'Pretendard', -apple-system, 'Noto Sans KR', system-ui, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+::selection {
+  background: var(--accent-blue-soft);
+  color: var(--text-primary);
+}
+
+/* 용어 도움말(Glossary Mode) ON 상태에서만 활성화되는 밑줄 스타일 */
+.glossary-term {
+  text-underline-offset: 3px;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--accent-mint);
+  text-decoration-thickness: 1.5px;
+  cursor: help;
+  border-radius: 2px;
+  transition: background-color 150ms ease;
+}
+
+.glossary-term:hover,
+.glossary-term[data-open='true'] {
+  background: var(--accent-mint-soft);
+}
+
+.glossary-term:focus-visible {
+  outline: 2px solid var(--accent-mint);
+  outline-offset: 2px;
+}
+
+@media print {
+  body {
+    background: white;
+  }
+}
