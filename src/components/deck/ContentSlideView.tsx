@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
 import type { ContentSlide } from '../../content/slides'
 import { SpeakerScriptPanel } from './SpeakerScriptPanel'
 import { SlideVisualRenderer } from './visuals/SlideVisualRenderer'
@@ -16,6 +18,18 @@ export function ContentSlideView({ slide, mode = 'deck' }: { slide: ContentSlide
       {slide.visual && (
         <div className="mt-8 text-left">
           <SlideVisualRenderer visual={slide.visual} />
+        </div>
+      )}
+
+      {slide.ctaLink && (
+        <div className="mt-6">
+          <Link
+            to={slide.ctaLink.to}
+            className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[14px] font-bold"
+            style={{ background: 'var(--accent-mint)', color: '#0a0c12' }}
+          >
+            {slide.ctaLink.label} <ArrowRight size={15} />
+          </Link>
         </div>
       )}
 

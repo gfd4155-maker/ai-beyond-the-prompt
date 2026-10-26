@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { to: '/read', label: '읽기 모드' },
   { to: '/chatbot-vs-agent', label: 'Chatbot vs AI Agent' },
   { to: '/prompt-improvement', label: '프롬프트 개선 시뮬레이터' },
+  { to: '/games', label: '게임' },
 ]
 
 export function TopBar() {

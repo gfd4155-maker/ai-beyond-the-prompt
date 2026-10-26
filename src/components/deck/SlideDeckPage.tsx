@@ -9,21 +9,45 @@ import {
   Minimize,
   NotebookText,
   X,
+  ZoomIn,
+  ZoomOut,
 } from 'lucide-react'
 import { ControlBar, type ControlAction } from '../common/ControlBar'
 import { SlideOverPanel } from '../common/SlideOverPanel'
 import { SpeakerScriptPanel } from './SpeakerScriptPanel'
 import { useFullscreen } from '../../hooks/useFullscreen'
-import { SECTION_LABELS, slides, totalSlides } from '../../content/slides'
+import { useFitStage } from '../../hooks/useFitStage'
+import { useFontScale } from '../../hooks/useFontScale'
+import { SECTION_LABELS, slides, totalSlides, type Slide } from '../../content/slides'
 import { ChatbotVsAgentScreen } from '../../features/chatbot-vs-agent/ChatbotVsAgentScreen'
 import { PromptImprovementScreen } from '../../features/prompt-improvement/PromptImprovementScreen'
 import { ContentSlideView } from './ContentSlideView'
 import { QuizSlideView } from './QuizSlideView'
 import { SectionBreakView } from './SectionBreakView'
 import { VerificationMiniView } from './VerificationMiniView'
+import { TurtleSoupCompareView } from './TurtleSoupCompareView'
 
 function clamp(n: number, min: number, max: number) {
   return Math.min(Math.max(n, min), max)
+}
+
+/** 현재 슬라이드 kind에 맞는 뷰를 고르는 공용 렌더러 — 일반 모드/전체화면 모드가 동일하게 사용합니다. */
+function SlideContent({ slide, edgeToEdge = true }: { slide: Slide; edgeToEdge?: boolean }) {
+  return (
+    <>
+      {slide.kind === 'content' && <ContentSlideView slide={slide} />}
+      {slide.kind === 'quiz' && <QuizSlideView slide={slide} />}
+      {slide.kind === 'section-break' && <SectionBreakView slide={slide} />}
+      {slide.kind === 'verification-mini' && <VerificationMiniView slide={slide} />}
+      {slide.kind === 'turtle-soup-compare' && <TurtleSoupCompareView slide={slide} />}
+      {slide.kind === 'interactive-embed' && (
+        <div className={edgeToEdge ? 'mx-auto -mx-4 -my-8 max-w-none sm:-mx-8 sm:-my-12' : 'mx-auto max-w-none'}>
+          {slide.componentKey === 'chatbot-vs-agent' && <ChatbotVsAgentScreen />}
+          {slide.componentKey === 'prompt-improvement' && <PromptImprovementScreen />}
+        </div>
+      )}
+    </>
+  )
 }
 
 export function SlideDeckPage() {
@@ -37,6 +61,13 @@ export function SlideDeckPage() {
   const slide = slides[currentIndex - 1]
   const isFirst = currentIndex === 1
   const isLast = currentIndex === totalSlides
+  const isEmbed = slide.kind === 'interactive-embed'
+
+  const { outerRef: stageOuterRef, innerRef: stageInnerRef, scale: stageScale, naturalHeight: stageHeight, designWidth } = useFitStage({
+    enabled: isFullscreen,
+    fitHeight: !isEmbed,
+  })
+  const fontScale = useFontScale()
 
   useEffect(() => {
     if (String(currentIndex) !== index) navigate(`/deck/${currentIndex}`, { replace: true })
@@ -73,6 +104,20 @@ export function SlideDeckPage() {
       { key: 'toc', label: '목차', icon: <List size={16} />, onClick: () => setTocOpen((v) => !v), active: tocOpen },
       { key: 'notes', label: '발표자 노트', icon: <NotebookText size={16} />, onClick: () => setNotesOpen((v) => !v), active: notesOpen },
       {
+        key: 'font-dec',
+        label: `글자 작게 (${fontScale.percent}%)`,
+        icon: <ZoomOut size={16} />,
+        onClick: fontScale.decrease,
+        disabled: !fontScale.canDecrease,
+      },
+      {
+        key: 'font-inc',
+        label: `글자 크게 (${fontScale.percent}%)`,
+        icon: <ZoomIn size={16} />,
+        onClick: fontScale.increase,
+        disabled: !fontScale.canIncrease,
+      },
+      {
         key: 'fullscreen',
         label: isFullscreen ? '전체화면 종료' : '전체화면',
         icon: isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />,
@@ -80,7 +125,7 @@ export function SlideDeckPage() {
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
     ],
-    [currentIndex, isFirst, isLast, tocOpen, notesOpen, isFullscreen],
+    [currentIndex, isFirst, isLast, tocOpen, notesOpen, isFullscreen, fontScale.percent],
   )
 
   return (
@@ -99,28 +144,54 @@ export function SlideDeckPage() {
         </div>
       </div>
 
-      <main className="flex-1 overflow-y-auto px-4 py-8 sm:px-8 sm:py-12">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={slide.id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.2 }}
+      {isFullscreen ? (
+        <main
+          ref={stageOuterRef}
+          className={
+            isEmbed
+              ? 'flex min-h-0 flex-1 justify-center overflow-y-auto px-4 py-4 sm:px-8'
+              : 'flex min-h-0 flex-1 items-center justify-center overflow-y-auto px-4 py-4 sm:px-8'
+          }
+        >
+          <div
+            style={{
+              width: designWidth * stageScale * fontScale.scale,
+              height: stageHeight * stageScale * fontScale.scale,
+              position: 'relative',
+            }}
           >
-            {slide.kind === 'content' && <ContentSlideView slide={slide} />}
-            {slide.kind === 'quiz' && <QuizSlideView slide={slide} />}
-            {slide.kind === 'section-break' && <SectionBreakView slide={slide} />}
-            {slide.kind === 'verification-mini' && <VerificationMiniView slide={slide} />}
-            {slide.kind === 'interactive-embed' && (
-              <div className="mx-auto -mx-4 -my-8 max-w-none sm:-mx-8 sm:-my-12">
-                {slide.componentKey === 'chatbot-vs-agent' && <ChatbotVsAgentScreen />}
-                {slide.componentKey === 'prompt-improvement' && <PromptImprovementScreen />}
+            <div
+              ref={stageInnerRef}
+              style={{
+                width: designWidth,
+                transform: `scale(${stageScale * fontScale.scale})`,
+                transformOrigin: 'top left',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+              }}
+            >
+              <SlideContent slide={slide} edgeToEdge={false} />
+            </div>
+          </div>
+        </main>
+      ) : (
+        <main className="flex-1 overflow-y-auto px-4 py-8 sm:px-8 sm:py-12">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={slide.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div style={{ transform: `scale(${fontScale.scale})`, transformOrigin: 'top center' }}>
+                <SlideContent slide={slide} />
               </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </main>
+            </motion.div>
+          </AnimatePresence>
+        </main>
+      )}
 
       <div className="border-t px-4 py-3 sm:px-8" style={{ borderColor: 'var(--border-subtle)' }}>
         <div className="mx-auto max-w-5xl">

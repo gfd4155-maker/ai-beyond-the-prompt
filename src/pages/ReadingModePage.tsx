@@ -4,6 +4,7 @@ import { ContentSlideView } from '../components/deck/ContentSlideView'
 import { QuizSlideView } from '../components/deck/QuizSlideView'
 import { SectionBreakView } from '../components/deck/SectionBreakView'
 import { VerificationMiniView } from '../components/deck/VerificationMiniView'
+import { TurtleSoupCompareView } from '../components/deck/TurtleSoupCompareView'
 import { SECTION_LABELS, slides, totalSlides } from '../content/slides'
 
 const INTERACTIVE_LINKS: Record<string, { to: string; label: string }> = {
@@ -43,6 +44,7 @@ export function ReadingModePage() {
               {slide.kind === 'quiz' && <QuizSlideView slide={slide} />}
               {slide.kind === 'section-break' && <SectionBreakView slide={slide} />}
               {slide.kind === 'verification-mini' && <VerificationMiniView slide={slide} />}
+              {slide.kind === 'turtle-soup-compare' && <TurtleSoupCompareView slide={slide} />}
               {slide.kind === 'interactive-embed' && (
                 <div className="mx-auto w-full max-w-3xl">
                   <h2 className="text-xl font-bold">{slide.title}</h2>

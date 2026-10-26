@@ -24,3 +24,4 @@ export type SlideVisual =
   | { kind: 'results-gallery'; items: ResultItem[] }
   | { kind: 'confidence-curve' }
   | { kind: 'vibe-coding-process' }
+  | { kind: 'mystery-briefing'; roundsLabel: string; notes: string[] }

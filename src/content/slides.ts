@@ -10,12 +10,12 @@ export const SECTION_LABELS: Record<SectionId, string> = {
   HOOK: '0~10분 · AI가 이런 것도 만들 수 있다고?',
   HISTORY: '10~25분 · 불과 몇 년 사이, 무슨 일이?',
   AGENT: '25~40분 · ChatGPT를 넘어 AI Agent로',
-  VIBECODING: '40~50분 · 코딩 몰라도 만드는 결과물',
-  BREAK: '50~60분 · AI PLAYGROUND',
-  REALITY: '60~80분 · 자신감 곡선과 현실의 벽',
-  CASES: '80~100분 · 업무를 바꾸는 AI 활용 사례',
-  STARTHOME: '100~110분 · 집에서 시작하는 나만의 AI Agent',
-  CLOSING: '110~120분 · 정리 & Q&A',
+  VIBECODING: '40~54분 · 코딩 몰라도 만드는 결과물',
+  BREAK: '54~64분 · AI PLAYGROUND',
+  REALITY: '64~84분 · 자신감 곡선과 현실의 벽',
+  CASES: '84~131분 · 업무를 바꾸는 AI 활용 사례 + 거북이스프 실습',
+  STARTHOME: '131~141분 · 집에서 시작하는 나만의 AI Agent',
+  CLOSING: '141~151분 · 정리 & Q&A',
 }
 
 /** 발표자 전용 대본 — 발표 화면에는 노출하지 않고 "발표자 노트"로만 보여줍니다. */
@@ -59,6 +59,8 @@ export interface ContentSlide extends SlideCommon {
   /** 화면에 보이는 유일한 설명 문장 — 30~50자 내외 목표 (선택) */
   screenText?: string
   visual?: SlideVisual
+  /** visual 아래에 선택적으로 보이는 행동유도 버튼 (예: 게임 탭으로 이동) */
+  ctaLink?: { to: string; label: string }
 }
 
 export interface QuizSlide extends SlideCommon {
@@ -94,7 +96,19 @@ export interface VerificationMiniSlide extends SlideCommon {
   bullets: string[]
 }
 
-export type Slide = ContentSlide | QuizSlide | SectionBreakSlide | InteractiveEmbedSlide | VerificationMiniSlide
+/** 거북이스프 교육 전/후 실습 결과를 발표 현장에서 직접 입력하는 비교표 (가짜 수치 없음) */
+export interface TurtleSoupCompareSlide extends SlideCommon {
+  kind: 'turtle-soup-compare'
+  keyMessage: string
+}
+
+export type Slide =
+  | ContentSlide
+  | QuizSlide
+  | SectionBreakSlide
+  | InteractiveEmbedSlide
+  | VerificationMiniSlide
+  | TurtleSoupCompareSlide
 
 export const slides: Slide[] = [
   // ═════════════ HOOK (0~10분, 3 화면) ═════════════
@@ -125,7 +139,7 @@ export const slides: Slide[] = [
     visual: {
       kind: 'results-gallery',
       items: [
-        { id: 'tetris', name: '테트리스 게임', icon: 'Gamepad2' },
+        { id: 'tetris', name: '테트리스 게임', icon: 'Gamepad2', demoUrl: '#/games/tetris' },
         { id: 'typing', name: '타자연습 게임', icon: 'Keyboard' },
         { id: 'coffee', name: '커피 주문 취합 웹사이트', icon: 'Coffee' },
         { id: 'budget', name: '가계부', icon: 'Wallet' },
@@ -384,7 +398,7 @@ export const slides: Slide[] = [
     },
   },
 
-  // ═════════════ VIBECODING (40~50분, 3 화면) ═════════════
+  // ═════════════ VIBECODING (40~54분, 4 화면) ═════════════
   {
     id: 'vibe-1',
     section: 'VIBECODING',
@@ -443,8 +457,31 @@ export const slides: Slide[] = [
       script:
         '회사에서 커피 주문받을 때 메신저로 하다 보면 누락되고, 수량 헷갈리고 그랬거든요. 그래서 "이거 좀 불편한데" 싶어서 신청 화면이랑 메뉴 선택, 관리자 확인 기능 있는 웹사이트를 만들어봤어요. UI 수정하고 오류 고치는 과정도 몇 번 있었죠.',
       keyConcept: '거창한 AI 프로젝트가 아니어도 됩니다. 내가 불편했던 작은 일 하나 해결하는 것부터 시작하면 됩니다.',
-      transition: '자, 10분 쉬어가겠습니다. 쉬는 동안 직접 체험해보실 수 있는 Playground 3가지를 준비했어요.',
+      transition: '이번엔 비슷한 방식으로 만들어본 게임도 하나 보여드릴게요.',
       durationMinutes: 3,
+    },
+  },
+  {
+    id: 'vibe-4',
+    section: 'VIBECODING',
+    minutes: 4,
+    kind: 'content',
+    title: 'AI로 게임도\n만들 수 있을까요?',
+    screenText: '"테트리스 게임을 만들어줘." — 딱 이 한 문장으로 시작했습니다.',
+    visual: {
+      kind: 'flow-row',
+      items: ['기본 프롬프트', '실행·테스트', '기능 요청 추가', '오류 수정', '완성된 게임'],
+    },
+    ctaLink: { to: '/games', label: '게임 탭에서 직접 플레이하기' },
+    presenterScript: '한 번에 완성된 것처럼 과장하지 않기 — 반복 개선 과정이었음을 강조.',
+    speakerScript: {
+      intro: '커피 주문 사이트 말고, 게임도 한번 만들어봤어요.',
+      script:
+        '"테트리스 게임을 만들어줘"라고 말했더니 일단 움직이는 블록이 나왔어요. 거기서 "회전이 이상해", "점수도 보여줘", "레벨 올라가면 빨라지게 해줘" 이렇게 하나씩 요청을 더하면서 지금 보시는 버전까지 왔습니다. 같은 방식으로 "갤러그 스타일 슈팅 게임 만들어줘"로 두 번째 게임도 만들어봤어요.',
+      keyConcept: '한 번의 명령으로 완성된 게 아니라, 프롬프트 → 실행 → 피드백 → 재요청을 반복한 결과입니다.',
+      clickTiming: '지금 바로 "게임 탭에서 직접 플레이하기" 버튼을 눌러서 보여줘도 좋고, 쉬는 시간에 체험하도록 안내해도 좋습니다.',
+      transition: '이제 10분 쉬어가겠습니다. 쉬는 동안 직접 체험해보실 수 있는 Playground 3가지를 준비했어요.',
+      durationMinutes: 4,
     },
   },
 
@@ -464,7 +501,7 @@ export const slides: Slide[] = [
     presenterScript: '발표를 멈추고 자유롭게 이동하며 개별 질문에 대응하세요.',
   },
 
-  // ═════════════ REALITY (60~80분, 4 화면) ═════════════
+  // ═════════════ REALITY (64~84분, 4 화면) ═════════════
   {
     id: 'real-1',
     section: 'REALITY',
@@ -538,7 +575,7 @@ export const slides: Slide[] = [
     },
   },
 
-  // ═════════════ CASES (80~100분, 5 화면) ═════════════
+  // ═════════════ CASES (84~131분, 12 화면 — 거북이스프 실습 포함) ═════════════
   {
     id: 'case-1',
     section: 'CASES',
@@ -558,8 +595,36 @@ export const slides: Slide[] = [
     speakerScript: {
       intro: '자 이제 진짜 업무 얘기로 가볼게요.',
       script: '오늘 네 가지 사례를 보여드릴 거예요 — 회의록 정리, VOC 분류, 일정 충돌 확인, 그리고 AI한테 일을 "제대로" 시키는 법까지요.',
-      transition: '먼저 회의록부터 가볼게요.',
+      transition: '그 전에, 재밌는 실습을 하나 먼저 해보겠습니다.',
       durationMinutes: 1,
+    },
+  },
+  {
+    id: 'turtle-pre-1',
+    section: 'CASES',
+    minutes: 8,
+    kind: 'content',
+    title: '게임을 한번\n해볼까요?',
+    screenText: '질문만으로 숨겨진 진실을 찾아보세요.',
+    visual: {
+      kind: 'mystery-briefing',
+      roundsLabel: '2문제 · 문제당 3~5분 내외',
+      notes: [
+        '문제와 정답은 발표자가 별도 화면으로 진행합니다.',
+        '질문은 "예/아니오"로 답할 수 있게 던져보세요.',
+        '정답을 맞히는 것보다, 질문을 어떻게 던지는지가 더 중요합니다.',
+      ],
+    },
+    presenterScript: '여기서부터는 별도 화면으로 거북이스프 문제 1~2를 직접 진행 (문제·정답은 이 화면에 없음).',
+    speakerScript: {
+      intro: '잠깐 강의를 멈추고, 같이 게임을 하나 해볼게요.',
+      script:
+        '지금부터 "거북이스프"라는 추리 게임을 진행하겠습니다. 제가 짧은 상황을 하나 보여드릴 텐데, 여러분은 "예/아니오"로 답할 수 있는 질문만 던져서 숨겨진 진실을 맞혀보시면 됩니다. 총 2문제, 문제당 3~5분 정도 드릴게요.',
+      question: '질문을 몇 개까지 던져야 정답에 가까워질 수 있을까요?',
+      clickTiming: '이 화면을 띄운 상태로 별도 화면(또는 구두)으로 문제 1을 출제 → 질문·추리 진행 → 문제 2도 동일하게 진행.',
+      keyConcept: '지금은 "얼마나 많이 질문하느냐"가 아니라 "어떻게 질문을 구조화하느냐"를 그냥 몸으로 느껴보는 단계입니다.',
+      transition: '자, 이제 이 경험을 그대로 업무 프롬프트에 연결해볼게요.',
+      durationMinutes: 8,
     },
   },
   {
@@ -578,8 +643,59 @@ export const slides: Slide[] = [
       intro: '"회의록 정리해줘"라고만 하면 어떻게 될까요?',
       script: '그냥 두면 AI가 대충 뭉뚱그려서 요약해요. 근데 "참석자 공유용으로, 결정 사항과 후속 조치를 표로 구분해서, 불분명한 건 확인 필요로 표시해줘"라고 하면 완전히 달라집니다. 이게 바로 "AI한테 일을 제대로 시키는 사람"이 하는 거예요.',
       keyConcept: 'AI도 일을 제대로 시키는 사람이 따로 있다',
-      transition: '이번엔 좀 더 양이 많은 업무, VOC 분류 가볼게요.',
+      transition: '그 "제대로 시키는 방법"을 다섯 글자로 정리하면 이렇습니다.',
       durationMinutes: 3,
+    },
+  },
+  {
+    id: 'cgcoi-1',
+    section: 'CASES',
+    minutes: 2,
+    kind: 'content',
+    title: '좋은 프롬프트의\n다섯 조각',
+    screenText: 'Context · Goal · Constraints · Output · Iteration',
+    visual: {
+      kind: 'icon-grid',
+      items: [
+        { icon: 'MessageSquare', label: 'Context — 배경과 상황 전달' },
+        { icon: 'Target', label: 'Goal — 원하는 목표 명시' },
+        { icon: 'ShieldAlert', label: 'Constraints — 조건과 제한사항' },
+        { icon: 'FileText', label: 'Output — 원하는 결과 형식' },
+        { icon: 'Lightbulb', label: 'Iteration — 확인 후 추가 개선' },
+      ],
+    },
+    presenterScript: '다섯 단어를 순서대로 짚되, 외우는 공식이 아니라 "체크리스트"라고 강조.',
+    speakerScript: {
+      intro: '방금 본 회의록 예시, 사실 다섯 가지 요소로 쪼개 볼 수 있어요.',
+      script:
+        'Context는 배경과 상황을 전달하는 거고, Goal은 원하는 목표를 명확히 말하는 거예요. Constraints는 지켜야 할 조건이나 제한, Output은 결과를 어떤 형식으로 받고 싶은지, Iteration은 결과를 보고 나서 다시 한번 더 다듬는 과정입니다. 이 다섯 가지를 다 채우려고 애쓸 필요는 없어요. 체크리스트처럼 "오늘은 뭐가 빠졌지?" 확인하는 용도로 쓰시면 됩니다.',
+      keyConcept: '다섯 단어를 외우는 게 중요한 게 아니라, 매번 "지금 내가 뭘 빼먹었나"를 점검하는 습관이 중요합니다.',
+      transition: '실제 VOC 정리 요청에 이 다섯 가지를 적용하면 어떻게 달라지는지 보여드릴게요.',
+      durationMinutes: 2,
+    },
+  },
+  {
+    id: 'cgcoi-2',
+    section: 'CASES',
+    minutes: 2,
+    kind: 'content',
+    title: 'VOC 정리 요청,\n다섯 조각을 채우면',
+    visual: {
+      kind: 'compare',
+      left: { title: '"이 VOC 내용 정리해줘."', items: ['목표·형식 미지정', '모호하고 일반적인 요약'] },
+      right: {
+        title: 'Context+Goal+Constraints+Output 적용',
+        items: ['원문 누락 없이 유형별 분류', '반복 의견·개선 필요 사항 정리', '카테고리·의견·원문·개선방향 표로 출력'],
+      },
+    },
+    presenterScript: '긴 문장을 그대로 읽지 말고, 왼쪽→오른쪽으로 구조만 짚기.',
+    speakerScript: {
+      intro: '같은 VOC 정리 요청도 다섯 조각을 채우면 이렇게 달라집니다.',
+      script:
+        '왼쪽처럼 "정리해줘"라고만 하면 AI가 대충 뭉뚱그려서 요약해요. 오른쪽처럼 배경(Context)과 목표(Goal), 지켜야 할 조건(Constraints: 원문 누락 금지), 받고 싶은 형식(Output: 표)을 채워서 요청하면, 결과물의 구조 자체가 달라집니다. 이게 아까 거북이스프에서 "질문을 구조화한다"고 느꼈던 것과 똑같은 원리예요.',
+      keyConcept: '추리 게임의 "좋은 질문"과 업무의 "좋은 프롬프트"는 둘 다 — 목표를 좁히고, 가진 정보를 활용하고, 불필요한 가능성을 제거하는 과정입니다.',
+      transition: '이번엔 좀 더 양이 많은 업무, VOC 분류 가볼게요.',
+      durationMinutes: 2,
     },
   },
   {
@@ -637,12 +753,93 @@ export const slides: Slide[] = [
       script:
         '목적, 배경, 독자, 제약, 출력 형식, 검증 기준 — 이 여섯 가지를 하나씩 눌러보면서 결과가 어떻게 달라지는지 같이 보시죠. "그냥 쓰는 것"과 "제대로 시키는 것"의 차이가 여기서 확 느껴집니다.',
       clickTiming: '요소를 하나씩 추가할 때마다 오른쪽 결과물이 바뀌는 걸 보여주고, 마지막에 "처음 vs 최종 비교"로 마무리.',
-      transition: '자, 이제 여러분도 집에서 시작할 수 있는 방법, 5단계로 정리해드릴게요.',
+      transition: '자, 그럼 아까 그 게임으로 다시 돌아가 볼게요 — 이번엔 질문을 바꿔서요.',
       durationMinutes: 9,
     },
   },
+  {
+    id: 'turtle-post-1',
+    section: 'CASES',
+    minutes: 8,
+    kind: 'content',
+    title: '이번에는\n질문을 바꿔볼까요?',
+    screenText: '방금 배운 방법을 활용해 더 효율적으로 추리해보세요.',
+    visual: {
+      kind: 'mystery-briefing',
+      roundsLabel: '2문제 · 문제당 3~5분 내외',
+      notes: [
+        '아까와 비슷한 난이도의 새로운 문제 2개를 진행합니다.',
+        '문제와 정답은 발표자가 별도 화면으로 진행합니다.',
+        '방금 배운 Context·Goal·Constraints·Output·Iteration을 질문에 적용해보세요.',
+      ],
+    },
+    presenterScript: '별도 화면으로 새 거북이스프 문제 2개 진행 (문제·정답은 이 화면에 없음). 교육 전과 비슷한 난이도로 준비.',
+    speakerScript: {
+      intro: '아까 1부에서 풀었던 것과 비슷한 난이도의 새로운 문제로 다시 해볼게요.',
+      script:
+        '똑같이 2문제, 문제당 3~5분입니다. 이번엔 방금 배운 다섯 조각 — 배경을 먼저 묻고, 목표를 좁히고, 조건을 걸고, 원하는 답의 형식을 정하고, 답을 들은 뒤 다시 질문을 다듬는 과정을 의식적으로 써보세요.',
+      clickTiming: '문제 1 → 질문·추리 → 문제 2까지 진행한 뒤, 다음 화면(비교표)으로 이동.',
+      transition: '자, 그럼 1부와 2부, 실제로 어떻게 달랐는지 같이 정리해볼게요.',
+      durationMinutes: 8,
+    },
+  },
+  {
+    id: 'turtle-compare-1',
+    section: 'CASES',
+    minutes: 3,
+    kind: 'turtle-soup-compare',
+    title: '1부 vs 2부,\n실제로 뭐가 달랐을까요?',
+    keyMessage: '방금 진행한 두 실습의 실측값을 직접 입력해보세요',
+    presenterScript: '현장에서 관찰한 실제 수치를 입력. 과장하거나 미리 꾸민 값 사용 금지.',
+    speakerScript: {
+      intro: '방금 두 번의 실습, 숫자로 한번 정리해볼게요.',
+      script:
+        '해결 여부, 질문 횟수, 걸린 시간, 불필요했던 질문 수, 그리고 앞서 들은 답을 다시 활용했는지를 1부와 2부 각각 입력해보겠습니다.',
+      keyConcept:
+        '측정의 한계: 문제 난이도를 최대한 비슷하게 준비했지만 완전히 동일할 수는 없고, 참가자 구성·순서 효과(먼저 푼 문제의 학습 효과)도 결과에 영향을 줄 수 있습니다. 이 비교는 "엄밀한 실험"이 아니라 "체감 차이를 눈으로 확인하는 활동"으로 안내해주세요. 교육 후 숫자가 더 안 좋게 나올 수도 있습니다 — 그 경우에도 그 자체가 "질문 방식이 결과에 영향을 준다"는 메시지를 뒷받침하므로 솔직하게 공유하세요.',
+      transition: '이 차이가 왜 생기는지, 핵심 메시지로 정리하고 넘어갈게요.',
+      durationMinutes: 3,
+    },
+  },
+  {
+    id: 'turtle-message-1',
+    section: 'CASES',
+    minutes: 2,
+    kind: 'content',
+    title: 'AI가 갑자기\n똑똑해진 게 아닙니다',
+    screenText: '질문이 구체적이고 명확해질수록, 원하는 결과에 더 가까워집니다.',
+    presenterScript: '천천히, 단정적으로 읽기.',
+    speakerScript: {
+      intro: '방금 실습에서 숫자가 어떻게 나왔든, 드리고 싶은 메시지는 하나예요.',
+      script:
+        'AI가 1부와 2부 사이에 갑자기 똑똑해진 게 아닙니다. 똑같은 AI, 똑같은 문제였어요. 달라진 건 우리가 질문을 던지는 방식입니다. 문제를 구조화하고, 주어진 정보를 활용하고, 불필요한 가능성을 하나씩 제거하는 과정 — 그게 질문의 품질을 바꾸고, 결과의 품질을 바꿉니다.',
+      keyConcept: '좋은 프롬프트는 정답을 외우는 기술이 아니라, 문제를 명확히 정의하는 기술입니다.',
+      transition: '다만 추리 게임과 실무 프롬프트가 완전히 똑같은 건 아니에요 — 그 차이도 짚고 갈게요.',
+      durationMinutes: 2,
+    },
+  },
+  {
+    id: 'turtle-message-2',
+    section: 'CASES',
+    minutes: 2,
+    kind: 'content',
+    title: '추리게임과 프롬프트,\n같은 점과 다른 점',
+    visual: {
+      kind: 'compare',
+      left: { title: '추리게임', items: ['이미 정해진 답을 좁혀가는 활동', '예/아니오 질문으로 가능성 제거'] },
+      right: { title: '실무 프롬프트', items: ['목표·맥락·조건을 전달하는 활동', 'AI가 결과를 새로 만들어내도록 요청'] },
+    },
+    presenterScript: '"완전히 같다"고 말하지 않기 — 공통점(질문 설계)에 초점.',
+    speakerScript: {
+      intro: '둘이 똑같다고 말하면 과장이에요. 정확히 뭐가 같고 다른지 짚을게요.',
+      script:
+        '추리게임은 이미 정해진 하나의 답을 질문으로 좁혀가는 활동이고, 프롬프트는 정해진 답이 없는 상태에서 AI에게 목표·맥락·조건을 전달해서 결과를 "새로 만들어내게" 하는 활동입니다. 다른 활동이에요. 하지만 공통점이 있습니다 — 둘 다 "질문을 어떻게 설계하느냐"가 결과의 질을 결정합니다. 오늘 실습에서 느낀 그 감각을, 업무 프롬프트에도 그대로 가져가시면 됩니다.',
+      transition: '자, 이제 여러분도 집에서 시작할 수 있는 방법, 5단계로 정리해드릴게요.',
+      durationMinutes: 2,
+    },
+  },
 
-  // ═════════════ STARTHOME (100~110분, 2 화면) ═════════════
+  // ═════════════ STARTHOME (131~141분, 2 화면) ═════════════
   {
     id: 'home-1',
     section: 'STARTHOME',
@@ -685,7 +882,7 @@ export const slides: Slide[] = [
     },
   },
 
-  // ═════════════ CLOSING (110~120분, 3 화면) ═════════════
+  // ═════════════ CLOSING (141~151분, 3 화면) ═════════════
   {
     id: 'close-1',
     section: 'CLOSING',

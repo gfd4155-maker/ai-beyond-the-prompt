@@ -6,6 +6,8 @@ import { ChatbotVsAgentScreen } from './features/chatbot-vs-agent/ChatbotVsAgent
 import { PromptImprovementScreen } from './features/prompt-improvement/PromptImprovementScreen'
 import { HomePage } from './pages/HomePage'
 import { ReadingModePage } from './pages/ReadingModePage'
+import { GamesHubPage } from './pages/GamesHubPage'
+import { GamePlayerPage } from './pages/GamePlayerPage'
 
 export default function App() {
   return (
@@ -20,6 +22,9 @@ export default function App() {
               <Route path="/read" element={<ReadingModePage />} />
               <Route path="/chatbot-vs-agent" element={<ChatbotVsAgentScreen />} />
               <Route path="/prompt-improvement" element={<PromptImprovementScreen />} />
+              <Route path="/games" element={<GamesHubPage />} />
+              <Route path="/games/tetris" element={<GamePlayerPage gameKey="tetris" />} />
+              <Route path="/games/galaga" element={<GamePlayerPage gameKey="galaga" />} />
             </Routes>
           </main>
         </div>

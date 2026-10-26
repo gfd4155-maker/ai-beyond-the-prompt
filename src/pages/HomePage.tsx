@@ -16,7 +16,7 @@ export function HomePage() {
         <span style={{ color: 'var(--text-secondary)' }}>질문하는 AI에서 일하는 AI로</span>
       </h1>
       <p className="mt-5 max-w-2xl text-[15px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-        반도체·제조업 임직원을 위한 120분 워크숍입니다. <GlossaryTerm id="agent">AI Agent</GlossaryTerm>와 바이브 코딩을
+        반도체·제조업 임직원을 위한 약 150분(거북이스프 실습 포함) 워크숍입니다. <GlossaryTerm id="agent">AI Agent</GlossaryTerm>와 바이브 코딩을
         직접 써본 발표자의 경험담과 시행착오를 중심으로, 화면은 핵심 메시지만 크게 보여주고 자세한 설명은 발표자
         대본에 담았습니다. 상단 우측의 <strong>용어 도움말</strong>을 켜면 전문 용어 설명을 바로 확인할 수 있습니다.
       </p>

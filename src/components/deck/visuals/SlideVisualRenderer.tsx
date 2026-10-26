@@ -12,9 +12,15 @@ import { GanttMiniVisual } from './GanttMiniVisual'
 import { ResultsGalleryVisual } from './ResultsGalleryVisual'
 import { ConfidenceCurveVisual } from './ConfidenceCurveVisual'
 import { VibeCodingProcessVisual } from './VibeCodingProcessVisual'
+import { MysteryBriefingVisual } from './MysteryBriefingVisual'
 
 export function SlideVisualRenderer({ visual }: { visual?: SlideVisual }) {
   if (!visual) return null
+
+  // 미스터리 브리핑 카드는 자체 테두리·배경(퍼플 톤)을 가지므로 공용 카드 래퍼를 쓰지 않습니다.
+  if (visual.kind === 'mystery-briefing') {
+    return <MysteryBriefingVisual roundsLabel={visual.roundsLabel} notes={visual.notes} />
+  }
 
   return (
     <div className="rounded-2xl border p-5 sm:p-7" style={{ borderColor: 'var(--border-subtle)', background: 'var(--bg-surface)' }}>
